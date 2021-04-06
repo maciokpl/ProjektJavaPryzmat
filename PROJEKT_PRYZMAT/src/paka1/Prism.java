@@ -42,6 +42,7 @@ public class Prism extends JFrame implements ActionListener {
 	JTextField field2;
 	JTextField field3;
 	JTextField field4;
+	JTextField wavelengthField;
 	
 	JLabel label1;
 	JLabel label2;
@@ -51,6 +52,7 @@ public class Prism extends JFrame implements ActionListener {
 	JLabel label6;
 	JLabel label7;
 	JLabel labelsuwak;
+	JLabel wavelengthLabel;
 	
 	JPanel panel1;
 	JPanel panel2;
@@ -150,6 +152,11 @@ public class Prism extends JFrame implements ActionListener {
 		panel1.add(label4);
 		field4 = new JTextField(" ");
 		panel1.add(field4);
+		
+		wavelengthLabel = new JLabel("Długość fali:");
+		panel1.add(wavelengthLabel);
+		wavelengthField = new JTextField(" ");
+		panel1.add(wavelengthField);
 		
 		panelC = new JPanel();	
 		panelC.setBackground(Color.LIGHT_GRAY);
