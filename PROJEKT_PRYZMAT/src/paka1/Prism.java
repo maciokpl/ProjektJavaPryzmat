@@ -87,7 +87,7 @@ public class Prism extends JFrame implements ActionListener {
 //Ustawienie paneli	
 		panel1 = new JPanel();					
 		this.add(panel1, BorderLayout.LINE_START);
-		panel1.setLayout(new GridLayout(17,1));
+		panel1.setLayout(new GridLayout(18,1));
 		panel1.setBackground(Color.LIGHT_GRAY);
 		panel1.setBorder(new EmptyBorder(10, 10, 10, 10));
 		
