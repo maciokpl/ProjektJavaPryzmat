@@ -1,18 +1,16 @@
 package paka1;
 
-import java.awt.BasicStroke;
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.FlowLayout;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.HeadlessException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Random;
-import javax.swing.ButtonGroup;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import javax.swing.JButton;
 import javax.swing.JColorChooser;
 import javax.swing.JDialog;
@@ -21,9 +19,7 @@ import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JRadioButton;
 import javax.swing.JSlider;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
@@ -36,7 +32,12 @@ public class Prism extends JFrame implements ActionListener {
 	static final int SLIDER_MAX = 29;
 	static final int SLIDER_INIT = 3;
 	
+	static final int SLIDER_RAY_MIN = 0;
+	static final int SLIDER_RAY_MAX = 180;
+	static final int SLIDER_RAY_INIT = 0;
+	
 	JSlider slider;
+	JSlider slider_ray;
 	
 	JTextField field1;
 	JTextField field2;
@@ -59,6 +60,7 @@ public class Prism extends JFrame implements ActionListener {
 	JPanel panel3;
 	JPanel panel4;
 	JPanel panel5;
+	DrawPrismPanel panel_pryzmat;
 	
 	JPanel panelA;
 	JPanel panelB;
@@ -78,11 +80,15 @@ public class Prism extends JFrame implements ActionListener {
 	JMenuItem saveFile;
 	JMenuItem openFile;
 	JMenuItem authors;
+	
+	ExecutorService exec;
 
+	
 	
 	public Prism() throws HeadlessException {
 		this.setSize(800,800);
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+		exec = Executors.newFixedThreadPool(2);
 		this.setLayout(new BorderLayout());
 //Ustawienie paneli	
 		panel1 = new JPanel();					
@@ -103,10 +109,10 @@ public class Prism extends JFrame implements ActionListener {
 		
 		panel4 = new JPanel();					
 		this.add(panel4, BorderLayout.PAGE_END);
-		
-		panel5 = new JPanel();					
-		this.add(panel5, BorderLayout.CENTER);
-		panel5.setBackground(Color.white);
+//stworzony panel do rysowania pryzmatu i promienia		
+		panel_pryzmat = new DrawPrismPanel();					
+		this.add(panel_pryzmat, BorderLayout.CENTER);
+		panel_pryzmat.setBackground(Color.white);
 //Lewy panel		
 		labelsuwak = new JLabel("Prędkość animacji");
 		panel1.add(labelsuwak);
@@ -150,8 +156,14 @@ public class Prism extends JFrame implements ActionListener {
 		
 		label4 = new JLabel("Kąt padania promienia:");
 		panel1.add(label4);
-		field4 = new JTextField(" ");
-		panel1.add(field4);
+		slider_ray = new JSlider(JSlider.HORIZONTAL, SLIDER_RAY_MIN, SLIDER_RAY_MAX, SLIDER_RAY_INIT);
+		panel1.add(slider_ray, BorderLayout.PAGE_START);
+		slider_ray.setMajorTickSpacing(30);
+		slider_ray.setMinorTickSpacing(10);
+		slider_ray.setPaintTicks(true);
+		slider_ray.setPaintLabels(true);
+		slider_ray.setBackground(Color.LIGHT_GRAY);
+		slider_ray.addChangeListener(new SliderRay());
 		
 		wavelengthLabel = new JLabel("Długość fali:");
 		panel1.add(wavelengthLabel);
@@ -167,14 +179,25 @@ public class Prism extends JFrame implements ActionListener {
 		button1.setBackground(Color.RED);
 		button1.setForeground(Color.BLACK);
 		panelD.add(button1);	
+		ActionListener listener_wylacz = new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) 
+			{
+				System.exit(1);
+			}	
+		};
+		button1.addActionListener(listener_wylacz);
 		
 		button2 = new JButton("Resetuj");
 		button2.setBackground(Color.YELLOW);
 		button2.setForeground(Color.BLACK);
-		panelD.add(button2);	
+		panelD.add(button2);
+		
+		
 //Górny panel	
 		startAnimation = new JButton ("Uruchom animację");
 		panel3.add(startAnimation);
+		startAnimation.addActionListener(new AnimationListener());
 		
 		changeLanguage = new JButton ("Change language");
 		panel3.add(changeLanguage);
@@ -195,7 +218,7 @@ public class Prism extends JFrame implements ActionListener {
 				ActionListener okListener = new ActionListener() {
 					public void actionPerformed(ActionEvent arg0) {
 						Color color = tcc.getColor();
-						panel5.setBackground(color);
+						panel_pryzmat.setBackground(color);
 					}
 				};
 				JDialog dialog = JColorChooser.createDialog(changeBackgroundColor, "title", true, tcc, okListener, cancelListener);
@@ -210,7 +233,7 @@ public class Prism extends JFrame implements ActionListener {
 		saveFile=new JMenuItem("Zapisz do pliku");
 		openFile= new JMenuItem("Wczytaj z pliku");
 		authors = new JMenuItem("Informacje o programie");
-		authors.addActionListener(authorsListener);
+		authors.addActionListener(new authorsListener());
 		menu.add(saveFile);
 		menu.add(openFile);
 		menu.add(authors);
@@ -218,7 +241,7 @@ public class Prism extends JFrame implements ActionListener {
 		this.setJMenuBar(menuBar);
 	}
 //Listenery
-			ActionListener authorsListener = new ActionListener() {
+			public class authorsListener implements ActionListener{
 				@Override
 				public void actionPerformed(ActionEvent arg0) {
 					JFrame authorFrame = new JFrame();
@@ -230,6 +253,37 @@ public class Prism extends JFrame implements ActionListener {
 					authorFrame.setVisible(true);
 				}
 			};
+			
+			public class SliderRay implements ChangeListener{
+				
+				@Override
+				public void stateChanged(ChangeEvent arg0) 
+				{
+					
+					double angle = slider_ray.getValue();		
+					panel_pryzmat.setAngle(angle);
+					repaint();
+				}
+				
+			}
+			
+			public class AnimationListener implements ActionListener{
+				
+				@Override
+				public void actionPerformed(ActionEvent arg0) 
+				{
+					panel_pryzmat.Animation();
+					exec.shutdown();
+				}
+				
+			}
+			
+			
+			
+			
+
+			
+			
 	
 	@Override
 	public void actionPerformed(ActionEvent e) {
