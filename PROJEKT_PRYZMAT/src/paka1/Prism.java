@@ -33,8 +33,8 @@ public class Prism extends JFrame implements ActionListener {
 	static final int SLIDER_INIT = 3;
 	
 	static final int SLIDER_RAY_MIN = 0;
-	static final int SLIDER_RAY_MAX = 180;
-	static final int SLIDER_RAY_INIT = 0;
+	static final int SLIDER_RAY_MAX = 90;
+	static final int SLIDER_RAY_INIT = 60;
 	
 	JSlider slider;
 	JSlider slider_ray;
@@ -83,7 +83,7 @@ public class Prism extends JFrame implements ActionListener {
 	
 	ExecutorService exec;
 
-	
+	int lambda=500;
 	
 	public Prism() throws HeadlessException {
 		this.setSize(800,800);
@@ -129,7 +129,7 @@ public class Prism extends JFrame implements ActionListener {
 		panel1.add(panelA);
 		panelA.setBackground(Color.LIGHT_GRAY);
 		
-		label6 = new JLabel("Kąt załamania promienia: ");
+		label6 = new JLabel("Kąt załamania promienia [deg]: ");
 		panel1.add(label6);
 		label7 = new JLabel("0");
 		panel1.add(label7);
@@ -139,22 +139,25 @@ public class Prism extends JFrame implements ActionListener {
 		panelB.setBackground(Color.LIGHT_GRAY);
 		panel1.add(panelB);
 		
-		label1 = new JLabel("Kąt załamania pryzmatu:");
+		label1 = new JLabel("Kąt załamania pryzmatu [deg]:");
 		panel1.add(label1);
-		field1 = new JTextField(" ");
+		field1 = new JTextField("60");
+		field1.addActionListener(new prismAngleListener());
 		panel1.add(field1);
 		
 		label2 = new JLabel("Współczynnik załamania pryzmatu:");
 		panel1.add(label2);
-		field2 = new JTextField(" ");
+		field2 = new JTextField("1");
+		field2.addActionListener(new npListener());
 		panel1.add(field2);
 		
 		label3 = new JLabel("Współczynnik załamania ośrodka:");
 		panel1.add(label3);
-		field3 = new JTextField(" ");
+		field3 = new JTextField("1");
+		field3.addActionListener(new noListener());
 		panel1.add(field3);
 		
-		label4 = new JLabel("Kąt padania promienia:");
+		label4 = new JLabel("Kąt padania promienia [deg]:");
 		panel1.add(label4);
 		slider_ray = new JSlider(JSlider.HORIZONTAL, SLIDER_RAY_MIN, SLIDER_RAY_MAX, SLIDER_RAY_INIT);
 		panel1.add(slider_ray, BorderLayout.PAGE_START);
@@ -165,9 +168,9 @@ public class Prism extends JFrame implements ActionListener {
 		slider_ray.setBackground(Color.LIGHT_GRAY);
 		slider_ray.addChangeListener(new SliderRay());
 		
-		wavelengthLabel = new JLabel("Długość fali:");
+		wavelengthLabel = new JLabel("Długość fali [nm]:");
 		panel1.add(wavelengthLabel);
-		wavelengthField = new JTextField(" ");
+		wavelengthField = new JTextField("500");
 		panel1.add(wavelengthField);
 		
 		panelD = new JPanel();		
@@ -254,6 +257,38 @@ public class Prism extends JFrame implements ActionListener {
 				}
 			};
 			
+			public class prismAngleListener implements ActionListener{
+				@Override
+				public void actionPerformed(ActionEvent arg0) {
+					double angle = Double.parseDouble(field1.getText());
+					panel_pryzmat.setPrismAngle(angle);
+					repaint();
+					
+				}
+				
+			}
+			
+			public class npListener implements ActionListener{
+
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					double n = Double.parseDouble(field2.getText());
+					panel_pryzmat.setNp(n);
+					
+				}
+				
+			}
+			
+			public class noListener implements ActionListener{
+
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					double n = Double.parseDouble(field3.getText());
+					panel_pryzmat.setNo(n);
+				}
+				
+			}
+			
 			public class SliderRay implements ChangeListener{
 				
 				@Override
@@ -261,7 +296,7 @@ public class Prism extends JFrame implements ActionListener {
 				{
 					
 					double angle = slider_ray.getValue();		
-					panel_pryzmat.setAngle(angle);
+					panel_pryzmat.setIncidenceAngle(angle);
 					repaint();
 				}
 				
@@ -272,17 +307,12 @@ public class Prism extends JFrame implements ActionListener {
 				@Override
 				public void actionPerformed(ActionEvent arg0) 
 				{
+					panel_pryzmat.init();
 					panel_pryzmat.Animation();
 					exec.shutdown();
 				}
 				
 			}
-			
-			
-			
-			
-
-			
 			
 	
 	@Override
