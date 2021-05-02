@@ -30,7 +30,7 @@ public class DrawPrismPanel extends JPanel{
         int iX3[];
         int iY3[];
         
-        Ray ray2;
+        Ray ray2; 
         Ray ray3;
         
         Boolean isAnimation = false;
