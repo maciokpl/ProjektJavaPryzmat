@@ -11,6 +11,7 @@ import javax.swing.JPanel;
 public class DrawPrismPanel extends JPanel{
 	
 		private static final boolean isAnim = false;
+		private boolean exit=false;
 		double prismAngle=Math.PI/3;
 		double incidenceAngle=Math.PI/3;
 		double beta2;
@@ -19,7 +20,7 @@ public class DrawPrismPanel extends JPanel{
 		double delta;
 		double nP=1;
 		double nO=1;
-		double speed=0.01;
+		long speed=1;
 		int[] triX={256,400,544}; 
         int[] triY={400,150,400};
         Color color = Color.BLUE;
@@ -29,6 +30,11 @@ public class DrawPrismPanel extends JPanel{
         int iY2[];
         int iX3[];
         int iY3[];
+        
+        Graphics2D g_tri;
+		Graphics2D g_ray1;
+		Graphics2D g_ray2;
+		Graphics2D g_ray3;
         
         Ray ray2; 
         Ray ray3;
@@ -94,7 +100,7 @@ public class DrawPrismPanel extends JPanel{
 	        g_tri.drawPolygon(triX, triY, 3); 
 	        
 	        g_ray1.setColor(color);
-	        g_ray1.setStroke(new BasicStroke(2));
+	        g_ray1.setStroke(new BasicStroke(4));
 	        g_ray1.drawPolygon(iX1, iY1, 2); 
 	        
 			if(isAnimation == true) {
@@ -110,9 +116,16 @@ public class DrawPrismPanel extends JPanel{
 	    }
 		
 		
+		public void setColor(Color wavecolor)
+		{
+			color=wavecolor;
+			repaint();
+		}
+		
+		
 				
 		void Animation() {
-
+			
 				ScheduledExecutorService scheduler = Executors
 						.newScheduledThreadPool(1);
 
@@ -120,22 +133,41 @@ public class DrawPrismPanel extends JPanel{
 
 					@Override
 					public void run() {
+						if(exit==false)
+						{
 							isAnimation = true;
+							
 							if(ray2.isDrawn==false) ray2.run();
 							if(ray2.isDrawn==true) ray3.run();
 							if(ray3.isDrawn == true) scheduler.shutdown();
 							repaint();
+							
+						}
+						
 					}
-				}), 0, 20, MILLISECONDS);
-
+					
+				}), 0, speed, MILLISECONDS);
+				
+				
+			
+			
 		}	
+		
+		void AnimationStop()
+		{
+			exit = true;
+		}
+		
+		void AnimationStart()
+		{
+			exit = false;
+		}
 		
 		public void setPrismAngle(double angle) 
 		{
 			isAnimation = false;
 			this.prismAngle = angle*Math.PI/180;
-			init();
-			
+			init();		
 		}
 		
 		public void setNo(double no) {
@@ -153,9 +185,9 @@ public class DrawPrismPanel extends JPanel{
 			init();
 		}
 		
-		public double getSpeed()
+		public void setSpeed(long speed)
 		{
-			return speed;
+			this.speed = speed;
 		}
 		
 		public double getPrismAngle()

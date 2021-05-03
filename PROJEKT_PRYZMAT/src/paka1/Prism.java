@@ -28,9 +28,9 @@ import javax.swing.event.ChangeListener;
 
 public class Prism extends JFrame implements ActionListener {
 
-	static final int SLIDER_MIN = 3;
-	static final int SLIDER_MAX = 29;
-	static final int SLIDER_INIT = 3;
+	static final int SLIDER_MIN = 1;
+	static final int SLIDER_MAX = 10;
+	static final int SLIDER_INIT = 5;
 	
 	static final int SLIDER_RAY_MIN = 0;
 	static final int SLIDER_RAY_MAX = 90;
@@ -70,7 +70,7 @@ public class Prism extends JFrame implements ActionListener {
 	JButton button1;
 	JButton button2;
 	
-	JButton startAnimation;
+	static JButton startAnimation;
 	JButton changeLanguage;
 	JButton stopAnimation;
 	JButton changeBackgroundColor;
@@ -83,7 +83,10 @@ public class Prism extends JFrame implements ActionListener {
 	
 	ExecutorService exec;
 
+	static String animtext;
+	long sliderspeed;
 	int lambda=500;
+	int animation_option=0;
 	
 	public Prism() throws HeadlessException {
 		this.setSize(800,800);
@@ -119,11 +122,12 @@ public class Prism extends JFrame implements ActionListener {
 		
 		slider = new JSlider(JSlider.HORIZONTAL, SLIDER_MIN, SLIDER_MAX, SLIDER_INIT);
 		panel1.add(slider, BorderLayout.PAGE_START);
-		slider.setMajorTickSpacing(5);
+		slider.setMajorTickSpacing(1);
 		slider.setMinorTickSpacing(1);
 		slider.setPaintTicks(true);
 		slider.setPaintLabels(true);
 		slider.setBackground(Color.LIGHT_GRAY);
+		slider.addChangeListener(new SliderSpeed());
 		
 		panelA = new JPanel();					
 		panel1.add(panelA);
@@ -172,6 +176,8 @@ public class Prism extends JFrame implements ActionListener {
 		panel1.add(wavelengthLabel);
 		wavelengthField = new JTextField("500");
 		panel1.add(wavelengthField);
+		wavelengthField.addActionListener(new WaveColorListener());
+		WaveColor();
 		
 		panelD = new JPanel();		
 		panelD.setLayout(new FlowLayout());
@@ -195,6 +201,7 @@ public class Prism extends JFrame implements ActionListener {
 		button2.setBackground(Color.YELLOW);
 		button2.setForeground(Color.BLACK);
 		panelD.add(button2);
+		button2.addActionListener(new ResetListener());
 		
 		
 //Górny panel	
@@ -302,16 +309,127 @@ public class Prism extends JFrame implements ActionListener {
 				
 			}
 			
+			public class SliderSpeed implements ChangeListener{
+				
+				@Override
+				public void stateChanged(ChangeEvent arg0) 
+				{
+					
+					sliderspeed = 11-slider.getValue();		
+					panel_pryzmat.setSpeed(sliderspeed);
+					repaint();
+				}
+				
+			}
+			
+			
 			public class AnimationListener implements ActionListener{
 				
 				@Override
 				public void actionPerformed(ActionEvent arg0) 
 				{
-					panel_pryzmat.init();
-					panel_pryzmat.Animation();
-					exec.shutdown();
+					if(animation_option==0)
+					{
+						startAnimation.setText("Zatrzymaj animację");
+						animation_option++;
+						panel_pryzmat.init();
+						panel_pryzmat.Animation();
+						panel_pryzmat.AnimationStart();
+						exec.shutdown();
+						WaveColor();
+					
+						
+					}
+					else if(animation_option==1)
+					{
+						startAnimation.setText("Uruchom animację");
+						animation_option--;
+						panel_pryzmat.AnimationStop();
+						WaveColor();
+					}
+					
+					
 				}
 				
+			}
+			
+			public class WaveColorListener implements ActionListener{
+				
+				@Override
+				public void actionPerformed(ActionEvent arg0) 
+				{
+					WaveColor();
+				}
+				
+			}
+			
+			public class ResetListener implements ActionListener{
+				
+				@Override
+				public void actionPerformed(ActionEvent arg0) 
+				{				
+					Reset();
+					WaveColor();
+				}
+				
+			}
+			
+			void WaveColor()
+			{
+				if(Double.parseDouble(wavelengthField.getText())<=200)
+				{
+					panel_pryzmat.setColor(Color.BLACK);
+				}
+				
+				if(Double.parseDouble(wavelengthField.getText())<=400 && Double.parseDouble(wavelengthField.getText())>200)
+				{
+					panel_pryzmat.setColor(Color.magenta);
+				}
+				
+				if(Double.parseDouble(wavelengthField.getText())<=450 && Double.parseDouble(wavelengthField.getText())>400)
+				{
+					panel_pryzmat.setColor(Color.blue);
+				}
+				
+				if(Double.parseDouble(wavelengthField.getText())<=500 && Double.parseDouble(wavelengthField.getText())>450)
+				{
+					panel_pryzmat.setColor(Color.cyan);
+				}
+				
+				if(Double.parseDouble(wavelengthField.getText())<=570 && Double.parseDouble(wavelengthField.getText())>500)
+				{
+					panel_pryzmat.setColor(Color.green);
+				}
+				
+				if(Double.parseDouble(wavelengthField.getText())<=600 && Double.parseDouble(wavelengthField.getText())>570)
+				{
+					panel_pryzmat.setColor(Color.yellow);
+				}
+				
+				if(Double.parseDouble(wavelengthField.getText())<=800 && Double.parseDouble(wavelengthField.getText())>600)
+				{
+					panel_pryzmat.setColor(Color.red);
+				}
+				
+				if(Double.parseDouble(wavelengthField.getText())>800)
+				{
+					panel_pryzmat.setColor(Color.black);
+				}
+			}
+			
+			
+			void Reset()
+			{
+				field1.setText("60");
+				field2.setText("1");
+				field3.setText("1");
+				wavelengthField.setText("500");				
+			}
+			
+			
+			public static void setAnimText()
+			{
+				startAnimation.setText("Uruchom animację");
 			}
 			
 	

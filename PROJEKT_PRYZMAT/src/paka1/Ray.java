@@ -43,4 +43,10 @@ public class Ray extends JPanel{
 			isDrawn = true;
 		}
 	}
+	
+	public void stop()
+	{
+		
+	}
+	
 }
