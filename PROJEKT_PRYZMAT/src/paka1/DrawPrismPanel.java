@@ -1,5 +1,7 @@
 package paka1;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static java.util.concurrent.TimeUnit.SECONDS;
+
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics;
@@ -20,7 +22,7 @@ public class DrawPrismPanel extends JPanel{
 		double delta;
 		double nP=1;
 		double nO=1;
-		long speed=1;
+		long speed=5;
 		int[] triX={256,400,544}; 
         int[] triY={400,150,400};
         Color color = Color.BLUE;
@@ -142,25 +144,33 @@ public class DrawPrismPanel extends JPanel{
 							if(ray3.isDrawn == true) scheduler.shutdown();
 							repaint();
 							
+							
+							
+							scheduler.schedule(new Runnable() {
+				                @Override
+								public void run() {  
+				                scheduler.shutdownNow();
+				                Prism.setAnimText();}
+				            }, speed/2, SECONDS);
+							
 						}
 						
 					}
 					
 				}), 0, speed, MILLISECONDS);
-				
-				
 			
-			
+				
 		}	
 		
 		void AnimationStop()
 		{
-			exit = true;
+			exit = true;		
 		}
 		
 		void AnimationStart()
 		{
 			exit = false;
+			
 		}
 		
 		public void setPrismAngle(double angle) 

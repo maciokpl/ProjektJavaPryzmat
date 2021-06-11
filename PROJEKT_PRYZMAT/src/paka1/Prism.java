@@ -69,6 +69,7 @@ public class Prism extends JFrame implements ActionListener {
 	
 	JButton button1;
 	JButton button2;
+	JButton button3;
 	
 	static JButton startAnimation;
 	JButton changeLanguage;
@@ -84,9 +85,11 @@ public class Prism extends JFrame implements ActionListener {
 	ExecutorService exec;
 
 	static String animtext;
+	String text_authors="autorzy: Maciej Kołakowski, Dominika Węgrzyniak";
 	long sliderspeed;
 	int lambda=500;
-	int animation_option=0;
+	static int animation_option=0;
+	static int language_option=0;
 	
 	public Prism() throws HeadlessException {
 		this.setSize(800,800);
@@ -203,6 +206,12 @@ public class Prism extends JFrame implements ActionListener {
 		panelD.add(button2);
 		button2.addActionListener(new ResetListener());
 		
+		button3 = new JButton("Aktualizuj");
+		button3.setBackground(Color.GREEN);
+		button3.setForeground(Color.BLACK);
+		panelD.add(button3);
+		button3.addActionListener(new UpdateListener());
+		
 		
 //Górny panel	
 		startAnimation = new JButton ("Uruchom animację");
@@ -211,7 +220,7 @@ public class Prism extends JFrame implements ActionListener {
 		
 		changeLanguage = new JButton ("Change language");
 		panel3.add(changeLanguage);
-		
+		changeLanguage.addActionListener(new LanguageListener());
 		
 		changeBackgroundColor = new JButton("Zmień kolor tła");
 		ActionListener chooseColorListener = new ActionListener() {
@@ -257,7 +266,7 @@ public class Prism extends JFrame implements ActionListener {
 					JFrame authorFrame = new JFrame();
 					authorFrame.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 					authorFrame.setSize(400, 200);
-					JLabel author = new JLabel ("autorzy: Maciej Kołakowski, Dominika Węgrzyniak");
+					JLabel author = new JLabel (text_authors);
 					author.setHorizontalAlignment(JLabel.CENTER);
 					authorFrame.add(author);
 					authorFrame.setVisible(true);
@@ -321,7 +330,7 @@ public class Prism extends JFrame implements ActionListener {
 				}
 				
 			}
-			
+				
 			
 			public class AnimationListener implements ActionListener{
 				
@@ -330,22 +339,40 @@ public class Prism extends JFrame implements ActionListener {
 				{
 					if(animation_option==0)
 					{
-						startAnimation.setText("Zatrzymaj animację");
+						
 						animation_option++;
 						panel_pryzmat.init();
 						panel_pryzmat.Animation();
 						panel_pryzmat.AnimationStart();
 						exec.shutdown();
 						WaveColor();
+						
+						if(language_option==0)
+						{
+							startAnimation.setText("Zatrzymaj animację");			
+						}
+						else if(language_option==1)
+						{
+							startAnimation.setText("Stop animation");
+						}
 					
 						
 					}
 					else if(animation_option==1)
 					{
-						startAnimation.setText("Uruchom animację");
+						
 						animation_option--;
 						panel_pryzmat.AnimationStop();
 						WaveColor();
+						
+						if(language_option==0)
+						{
+							startAnimation.setText("Uruchom animację");			
+						}
+						else if(language_option==1)
+						{
+							startAnimation.setText("Start animation");
+						}
 					}
 					
 					
@@ -373,6 +400,110 @@ public class Prism extends JFrame implements ActionListener {
 				}
 				
 			}
+			
+			public class LanguageListener implements ActionListener{
+				
+				@Override
+				public void actionPerformed(ActionEvent arg0) 
+				{				
+					
+					
+					if(language_option==0)
+					{
+						label6.setText("Angle of refraction [deg]:");
+						label4.setText("Angle of incidence [deg]:");
+						label1.setText("Apical angle [deg]:");
+						label2.setText("Refractive index (prism):");
+						label3.setText("Refractive index (medium):");
+						labelsuwak.setText("Animation speed");
+						wavelengthLabel.setText("Wavelength [nm]:");
+						button1.setText("Exit");
+						button2.setText("Reset");
+						changeLanguage.setText("Zmień język");
+						changeBackgroundColor.setText("Change background color");
+						menu.setText("Options");
+						saveFile.setText("Save");
+						openFile.setText("Load");
+						authors.setText("About...");
+						text_authors="by Maciej Kołakowski, Dominika Węgrzyniak";
+						button3.setText("Update");
+						
+						if(animation_option==0)
+						{
+							startAnimation.setText("Start animation");				
+						}
+						else if(animation_option==1)
+						{
+							startAnimation.setText("Stop animation");
+						}
+						
+						language_option=1;
+					
+					}
+					else if(language_option==1)
+					{
+						
+						label6.setText("Kąt załamania promienia [deg]:");
+						label4.setText("Kąt padania promienia [deg]:");
+						label1.setText("Kąt załamania pryzmatu [deg]:");
+						label2.setText("Współczynnik załamania pryzmatu:");
+						label3.setText("Współczynnik załamania ośrodka:");
+						labelsuwak.setText("Prędkość animacji");
+						wavelengthLabel.setText("Długość fali [nm]:");
+						button1.setText("Wyłącz");
+						button2.setText("Resetuj");
+						changeLanguage.setText("Change language");
+						changeBackgroundColor.setText("Zmień kolor tła");
+						menu.setText("Opcje");
+						saveFile.setText("Zapisz do pliku");
+						openFile.setText("Wczytaj z pliku");
+						authors.setText("Informacje o programie");
+						text_authors="autorzy: Maciej Kołakowski, Dominika Węgrzyniak";
+						button3.setText("Aktualizuj");
+						
+						if(animation_option==0)
+						{
+							startAnimation.setText("Uruchom animację");				
+						}
+						else if(animation_option==1)
+						{
+							startAnimation.setText("Zatrzymaj animację");
+						}
+						
+						language_option=0;
+						
+					}
+					
+					
+				}
+				
+			}
+			
+			
+			public class UpdateListener implements ActionListener{
+
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					Update();				
+				}
+				
+			}
+			
+			void Update()
+			{
+				WaveColor();
+				
+				double n1 = Double.parseDouble(field3.getText());
+				panel_pryzmat.setNo(n1);
+				
+				double n2 = Double.parseDouble(field2.getText());
+				panel_pryzmat.setNp(n2);
+				
+				double angle = Double.parseDouble(field1.getText());
+				panel_pryzmat.setPrismAngle(angle);
+				repaint();
+			}
+			
 			
 			void WaveColor()
 			{
@@ -423,13 +554,22 @@ public class Prism extends JFrame implements ActionListener {
 				field1.setText("60");
 				field2.setText("1");
 				field3.setText("1");
-				wavelengthField.setText("500");				
+				wavelengthField.setText("500");	
+				Update();
 			}
 			
 			
 			public static void setAnimText()
 			{
+				if(language_option==0)
+				{
 				startAnimation.setText("Uruchom animację");
+				}
+				else if(language_option==1)
+				{
+				startAnimation.setText("Start animation");
+				}
+				animation_option=0;
 			}
 			
 	
