@@ -8,6 +8,8 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 public class DrawPrismPanel extends JPanel{
@@ -18,6 +20,8 @@ public class DrawPrismPanel extends JPanel{
 		double beta1;
 		double alpha2;
 		double delta;
+		double alpha_gr1=180;
+		double alpha_gr2=180;
 		double nP=1;
 		double nO=1;
 		long speed=5;
@@ -41,6 +45,7 @@ public class DrawPrismPanel extends JPanel{
         
         Boolean isAnimation = false;
     	Boolean isDone = false;
+    	Boolean isRay2 = true;
         
         DrawPrismPanel(){
         	init();
@@ -48,6 +53,7 @@ public class DrawPrismPanel extends JPanel{
         
 //ustawianie potrzebnych wielkosci
         public void init() {
+        	isRay2 = true;
         	isAnimation = false;
         	
         	iX1 = new int[2];
@@ -58,33 +64,64 @@ public class DrawPrismPanel extends JPanel{
   	        iY3 = new int[2];
   	        
   	        int x = (int) ((int) 250 * Math.tan(prismAngle/2));
-			triX[0] = 400-x;
-			triX[1] = 400;
-			triX[2] = 400+x;
+			triX[0] = 600-x;
+			triX[1] = 600;
+			triX[2] = 600+x;
   	        
   	        beta1 = Math.asin(nO*Math.sin(incidenceAngle)/nP);
-			beta2 = prismAngle - beta1;
-			alpha2 = Math.asin(nP*Math.sin(beta2)/nO);
-			delta = incidenceAngle + alpha2 - prismAngle;
+			if(nO>nP) {
+				alpha_gr1 = Math.asin(nP/nO);
+			}
+			else {
+				alpha_gr1 = 180;
+			}
   	        
-  	    	iX1[0] = (int) (triX[1]-125*Math.tan(prismAngle/2) - 150);
-          	iY1[0] = (int) (275 - 150*Math.tan(prismAngle/2 - incidenceAngle));
-          	iX1[1] = (int) (triX[1]-125*Math.tan(prismAngle/2));
-          	iY1[1] = 275;
-          	
-          	iX2[0] = iX1[1];
-          	iY2[0] = iY1[1];
-          	iX2[1] = (int) (iX2[0] + (250*Math.sin(prismAngle)/(2*Math.cos(prismAngle/2)*Math.sin(Math.PI/2 - beta2)))*Math.sin(Math.PI/2 - beta2 + prismAngle/2));
-          	iY2[1] = (int) (iY2[0] + (250*Math.sin(prismAngle)/(2*Math.cos(prismAngle/2)*Math.sin(Math.PI/2 - beta2)))*Math.cos(Math.PI/2 - beta2 + prismAngle/2));
-          	
-          	iX3[0] = iX2[1];
-          	iY3[0] = iY2[1];
-          	iX3[1] = (int) (iX3[0] + 200); 
-          	iY3[1] = (int) (iY3[0] - 200* Math.tan(prismAngle/2 - alpha2)); 
-          	
-          	ray2 = new Ray(iX2[0], iX2[1], iY2[0], iY2[1], -prismAngle/2+beta1, color);
-          	ray3 = new Ray(iX3[0], iX3[1], iY3[0], iY3[1], prismAngle/2-alpha2, color);
-          	
+			if(prismAngle - incidenceAngle/nP <= Math.PI/3) {
+				beta2 = prismAngle - beta1;
+				alpha2 = Math.asin(nP*Math.sin(beta2)/nO);
+				delta = incidenceAngle + alpha2 - prismAngle;
+				
+	  	    	iX1[0] = (int) (triX[1]-125*Math.tan(prismAngle/2) - 150);
+	          	iY1[0] = (int) (275 - 150*Math.tan(prismAngle/2 - incidenceAngle));
+	          	iX1[1] = (int) (triX[1]-125*Math.tan(prismAngle/2));
+	          	iY1[1] = 275;
+	          	
+	          	iX2[0] = iX1[1];
+	          	iY2[0] = iY1[1];
+	          	iX2[1] = (int) (iX2[0] + (250*Math.sin(prismAngle)/(2*Math.cos(prismAngle/2)*Math.sin(Math.PI/2 - beta2)))*Math.sin(Math.PI/2 - beta2 + prismAngle/2));
+	          	iY2[1] = (int) (iY2[0] + (250*Math.sin(prismAngle)/(2*Math.cos(prismAngle/2)*Math.sin(Math.PI/2 - beta2)))*Math.cos(Math.PI/2 - beta2 + prismAngle/2));
+	          	
+	          	iX3[0] = iX2[1];
+	          	iY3[0] = iY2[1];
+	          	iX3[1] = (int) (iX3[0] + 200); 
+	          	iY3[1] = (int) (iY3[0] - 200* Math.tan(prismAngle/2 - alpha2)); 
+	          	
+	          	ray2 = new Ray(iX2[0], iX2[1], iY2[0], iY2[1], -prismAngle/2+beta1, color);
+	          	ray3 = new Ray(iX3[0], iX3[1], iY3[0], iY3[1], prismAngle/2-alpha2, color);
+			}
+			else {
+				iX1[0] = (int) (triX[1]-125*Math.tan(prismAngle/2) - 150);
+	          	iY1[0] = (int) (275 - 150*Math.tan(prismAngle/2 - incidenceAngle));
+	          	iX1[1] = (int) (triX[1]-125*Math.tan(prismAngle/2));
+	          	iY1[1] = 275;
+	          	
+	          	iX2[0] = iX1[1];
+	          	iY2[0] = iY1[1];
+	          	iX2[1] = (int) (iX1[1] + 125/Math.tan(prismAngle/2 - beta1));
+	          	iY2[1] = 400;
+	          	
+	          	beta2 = Math.PI/2 - prismAngle +beta1;
+	          	alpha2 = Math.asin(nP*Math.sin(beta2)/nO);
+				delta = incidenceAngle + alpha2 - prismAngle;
+	          	
+	          	iX3[0] = iX2[1];
+	          	iY3[0] = iY2[1];
+	          	iX3[1] = (int) (iX3[0] + 200); 
+	          	iY3[1] = (int) (iY3[0] + 200* Math.tan(alpha2)); 
+	          	
+	          	ray2 = new Ray(iX2[0], iX2[1], iY2[0], iY2[1], -prismAngle/2+beta1, color);
+	          	ray3 = new Ray(iX3[0], iX3[1], iY3[0], iY3[1], -prismAngle/2+alpha2, color);
+			}
         }
         
 		public void paint(Graphics g)
@@ -121,7 +158,7 @@ public class DrawPrismPanel extends JPanel{
 		        	g_ray2.drawLine(ray2.xStart, ray2.yStart, ray2.currentX, ray2.currentY);  
 		        }
 		        
-		        if (ray2.isDrawn==true) {
+		        if (ray2.isDrawn==true && isRay2 == true) {
 		        	g_ray2.drawLine(ray2.xStart, ray2.yStart, ray2.xEnd, ray2.yEnd); 
 		        	g_ray3.drawLine(ray3.xStart, ray3.yStart, ray3.currentX, ray3.currentY); 
 		        }
@@ -138,6 +175,36 @@ public class DrawPrismPanel extends JPanel{
 		
 				
 		void Animation() {
+				if(incidenceAngle>=alpha_gr1) {
+					JOptionPane.showMessageDialog(getRootPane(), "Całkowite wewnętrzne odbicie");
+					return;
+				}
+				if(prismAngle - incidenceAngle <= Math.PI/3) {
+					beta2 = prismAngle - beta1;
+					alpha2 = Math.asin(nP*Math.sin(beta2)/nO);
+					delta = incidenceAngle + alpha2 - prismAngle;
+					
+					if(nP>nO) {
+						alpha_gr2 = Math.asin(nO/nP);
+						if (alpha_gr2<beta2) {
+							isRay2 = false;
+						}
+					}
+				}
+			
+				else {
+					beta2 = Math.PI/2 - prismAngle-beta1;
+		          	alpha2 = Math.asin(nP*Math.sin(beta2)/nO);
+					delta = incidenceAngle + alpha2 - prismAngle;
+
+					if(nP>nO) {
+						alpha_gr2 = Math.asin(nO/nP);
+						if (alpha_gr2<(Math.PI/2 - prismAngle/2 + beta1)) {
+							isRay2 = false;
+						}
+					}
+				}
+				
 				if (isDone==true) {
 					init();
 					isDone=false;
@@ -148,6 +215,11 @@ public class DrawPrismPanel extends JPanel{
 					@Override
 					public void run() {
 							if(ray2.isDrawn==false) ray2.run();
+							if (ray2.isDrawn==true && isRay2 == false) {
+					        	JOptionPane.showMessageDialog(getRootPane(), "Całkowite wewnętrzne odbicie");
+					        	delta = 0;
+					        	scheduler.shutdownNow();
+							}
 							if(ray2.isDrawn==true) ray3.run();
 							if(ray3.isDrawn == true) {
 								scheduler.shutdown();

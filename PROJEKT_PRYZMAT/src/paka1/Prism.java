@@ -103,7 +103,7 @@ public class Prism extends JFrame implements ActionListener {
 	static int language_option=0;
 	
 	public Prism() throws HeadlessException {
-		this.setSize(1000,800);
+		this.setSize(1500,800);
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		exec = Executors.newFixedThreadPool(2);
 		this.setLayout(new BorderLayout());
