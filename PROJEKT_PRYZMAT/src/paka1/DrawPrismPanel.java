@@ -12,8 +12,6 @@ import javax.swing.JPanel;
 
 public class DrawPrismPanel extends JPanel{
 	
-		private static final boolean isAnim = false;
-		private boolean exit=false;
 		double prismAngle=Math.PI/3;
 		double incidenceAngle=Math.PI/3;
 		double beta2;
@@ -42,6 +40,7 @@ public class DrawPrismPanel extends JPanel{
         Ray ray3;
         
         Boolean isAnimation = false;
+    	Boolean isDone = false;
         
         DrawPrismPanel(){
         	init();
@@ -104,8 +103,20 @@ public class DrawPrismPanel extends JPanel{
 	        g_ray1.setColor(color);
 	        g_ray1.setStroke(new BasicStroke(4));
 	        g_ray1.drawPolygon(iX1, iY1, 2); 
+	        if (ray2.isDrawn==false) {
+	        	g_ray3.setColor(Color.RED);
+	        	g_ray3.drawLine(ray3.xStart, ray3.yStart, ray3.currentX, ray3.currentY);
+	        	g_ray2.setColor(color);
+	        	g_ray2.drawLine(ray2.xStart, ray2.yStart, ray2.currentX, ray2.currentY);
+	        	
+	        }
+	        else {
+	        	g_ray2.drawLine(ray2.xStart, ray2.yStart, ray2.currentX, ray2.currentY);
+	        	g_ray3.drawLine(ray3.xStart, ray3.yStart, ray3.currentX, ray3.currentY); 
+	        }
 	        
 			if(isAnimation == true) {
+				g_ray1.setColor(color);
 		        if (ray2.isDrawn==false) {
 		        	g_ray2.drawLine(ray2.xStart, ray2.yStart, ray2.currentX, ray2.currentY);  
 		        }
@@ -127,50 +138,46 @@ public class DrawPrismPanel extends JPanel{
 		
 				
 		void Animation() {
-			
-				ScheduledExecutorService scheduler = Executors
-						.newScheduledThreadPool(1);
-
+				if (isDone==true) {
+					init();
+					isDone=false;
+				}
+				ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 				scheduler.scheduleAtFixedRate((new Runnable() {
 
 					@Override
 					public void run() {
-						if(exit==false)
-						{
-							isAnimation = true;
-							
 							if(ray2.isDrawn==false) ray2.run();
 							if(ray2.isDrawn==true) ray3.run();
-							if(ray3.isDrawn == true) scheduler.shutdown();
+							if(ray3.isDrawn == true) {
+								scheduler.shutdown();
+								isDone=true;
+							}
+							if (isAnimation == true)
 							repaint();
-							
-							
-							
-							scheduler.schedule(new Runnable() {
-				                @Override
-								public void run() {  
-				                scheduler.shutdownNow();
-				                Prism.setAnimText();}
-				            }, speed/2, SECONDS);
-							
-						}
-						
+							else {
+								try {
+									this.wait();
+								} catch (InterruptedException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
+							}
 					}
 					
 				}), 0, speed, MILLISECONDS);
-			
-				
 		}	
 		
-		void AnimationStop()
+		public void AnimationStop() throws InterruptedException
+		
 		{
-			exit = true;		
+			isAnimation = false;
+			repaint();
 		}
 		
-		void AnimationStart()
+		public void AnimationStart() 
 		{
-			exit = false;
-			
+			isAnimation=true;
 		}
 		
 		public void setPrismAngle(double angle) 

@@ -44,9 +44,4 @@ public class Ray extends JPanel{
 		}
 	}
 	
-	public void stop()
-	{
-		
-	}
-	
 }

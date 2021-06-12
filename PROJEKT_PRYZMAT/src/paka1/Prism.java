@@ -1,6 +1,8 @@
 package paka1;
 
 
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.FlowLayout;
@@ -9,16 +11,25 @@ import java.awt.GridLayout;
 import java.awt.HeadlessException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+
 import javax.swing.JButton;
 import javax.swing.JColorChooser;
 import javax.swing.JDialog;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.JTextField;
@@ -71,7 +82,7 @@ public class Prism extends JFrame implements ActionListener {
 	JButton button2;
 	JButton button3;
 	
-	static JButton startAnimation;
+	JButton startAnimation;
 	JButton changeLanguage;
 	JButton stopAnimation;
 	JButton changeBackgroundColor;
@@ -92,7 +103,7 @@ public class Prism extends JFrame implements ActionListener {
 	static int language_option=0;
 	
 	public Prism() throws HeadlessException {
-		this.setSize(800,800);
+		this.setSize(1000,800);
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		exec = Executors.newFixedThreadPool(2);
 		this.setLayout(new BorderLayout());
@@ -216,7 +227,12 @@ public class Prism extends JFrame implements ActionListener {
 //Górny panel	
 		startAnimation = new JButton ("Uruchom animację");
 		panel3.add(startAnimation);
-		startAnimation.addActionListener(new AnimationListener());
+		startAnimation.addActionListener(new StartAnimationListener());
+		
+		stopAnimation = new JButton ("Zatrzymaj animację");
+		panel3.add(stopAnimation);
+		stopAnimation.setVisible(false);
+		stopAnimation.addActionListener(new StopAnimationListener());
 		
 		changeLanguage = new JButton ("Change language");
 		panel3.add(changeLanguage);
@@ -249,14 +265,22 @@ public class Prism extends JFrame implements ActionListener {
 //Menu
 		menuBar = new JMenuBar();
 		menu = new JMenu("Opcje");
+		
 		saveFile=new JMenuItem("Zapisz do pliku");
+		saveFile.addActionListener(new SaveListener());
+		
 		openFile= new JMenuItem("Wczytaj z pliku");
+		openFile.addActionListener(new OpenListener());
+		
 		authors = new JMenuItem("Informacje o programie");
 		authors.addActionListener(new authorsListener());
+		
 		menu.add(saveFile);
 		menu.add(openFile);
 		menu.add(authors);
+		
 		menuBar.add(menu);
+		
 		this.setJMenuBar(menuBar);
 	}
 //Listenery
@@ -330,22 +354,32 @@ public class Prism extends JFrame implements ActionListener {
 				}
 				
 			}
-				
 			
-			public class AnimationListener implements ActionListener{
+			public class StartAnimationListener implements ActionListener{
 				
 				@Override
 				public void actionPerformed(ActionEvent arg0) 
 				{
-					if(animation_option==0)
-					{
+					label7.setText(String.valueOf(panel_pryzmat.getDelta()));
+					startAnimation.setVisible(false);
+					stopAnimation.setVisible(true);
+					panel_pryzmat.AnimationStart();
+					panel_pryzmat.Animation();
+					ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+					scheduler.scheduleAtFixedRate((new Runnable() {
+
+						@Override
+						public void run() {
+							if (panel_pryzmat.isDone == true) {
+								stopAnimation.setVisible(false);
+								startAnimation.setVisible(true);
+								scheduler.shutdown();
+							}
+							
+						}
 						
-						animation_option++;
-						panel_pryzmat.init();
-						panel_pryzmat.Animation();
-						panel_pryzmat.AnimationStart();
-						exec.shutdown();
-						WaveColor();
+					}), 0, 1, MILLISECONDS);
+					
 						
 						if(language_option==0)
 						{
@@ -356,25 +390,97 @@ public class Prism extends JFrame implements ActionListener {
 							startAnimation.setText("Stop animation");
 						}
 					
-						
-					}
-					else if(animation_option==1)
+				}
+				
+			};
+			
+			public class StopAnimationListener implements ActionListener{
+							
+							@Override
+					public void actionPerformed(ActionEvent arg0) 
 					{
-						
-						animation_option--;
-						panel_pryzmat.AnimationStop();
-						WaveColor();
-						
-						if(language_option==0)
-						{
-							startAnimation.setText("Uruchom animację");			
-						}
-						else if(language_option==1)
-						{
-							startAnimation.setText("Start animation");
-						}
+							startAnimation.setVisible(true);
+							stopAnimation.setVisible(false);
+							try {
+								panel_pryzmat.AnimationStop();
+							} catch (InterruptedException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+							
+							if(language_option==0)
+							{
+								startAnimation.setText("Uruchom animację");			
+							}
+							else if(language_option==1)
+							{
+								startAnimation.setText("Start animation");
 					}
+				}
+			};
+			
+			public class SaveListener implements ActionListener{
+
+				@Override
+				public void actionPerformed(ActionEvent arg0) {
 					
+					String text = field1.getText() + "\n" + field2.getText() + "\n" + field3.getText() + "\n" + String.valueOf(slider_ray.getValue()) + "\n" + wavelengthField.getText();
+					
+					JOptionPane.showMessageDialog(rootPane, "Dane zostaną zapisane w kolejności: \n kąt załamania pryzmatu \n współczynnik załamania pryzmatu \n współczynnik załamania ośrodka \n kąt padania promienia \n długość fali");
+					
+					JFileChooser fc = new JFileChooser();
+					fc.showSaveDialog(rootPane);
+					BufferedWriter writer = null;
+			        try {
+			            writer = new BufferedWriter(new FileWriter(fc.getSelectedFile().getPath()));
+			            writer.write(text);
+			        } 
+			        catch (Exception e1) {
+			            e1.printStackTrace();
+			        } 
+			        finally {
+			            try {
+			                if (null != writer) {
+			                    writer.close();
+			                }
+			            } catch (Exception e1) {
+			                e1.printStackTrace();
+			            }
+			        }
+					
+				}
+				
+			}
+			
+			public class OpenListener implements ActionListener{
+
+				@Override
+				public void actionPerformed(ActionEvent arg0) {
+					JOptionPane.showMessageDialog(rootPane, "Dane zostaną zapisane w kolejności: \n kąt załamania pryzmatu \n współczynnik załamania pryzmatu \n współczynnik załamania ośrodka \n kąt padania promienia \n długość fali");
+
+					try {
+						JFileChooser fc = new JFileChooser();
+						fc.showOpenDialog(rootPane);
+						FileReader reader = new FileReader(fc.getSelectedFile().getAbsolutePath());
+			            
+						BufferedReader original = new BufferedReader(reader);
+						String textLine= original.readLine();
+						field1.setText(textLine);
+						textLine= original.readLine();
+						field2.setText(textLine);
+						textLine= original.readLine();
+						field3.setText(textLine);
+						textLine= original.readLine();
+						int n = Integer.parseUnsignedInt(textLine);
+						slider_ray.setValue(n);
+						textLine= original.readLine();
+						wavelengthField.setText(textLine);
+						original.close();
+						}
+					catch (IOException e) {
+						System.out.println(e.getMessage());
+						JOptionPane.showMessageDialog(rootPane, "Nie udało się wczytać pliku");
+					}
 					
 				}
 				
@@ -395,6 +501,8 @@ public class Prism extends JFrame implements ActionListener {
 				@Override
 				public void actionPerformed(ActionEvent arg0) 
 				{				
+					startAnimation.setVisible(true);
+					stopAnimation.setVisible(false);
 					Reset();
 					WaveColor();
 				}
@@ -479,7 +587,6 @@ public class Prism extends JFrame implements ActionListener {
 				
 			}
 			
-			
 			public class UpdateListener implements ActionListener{
 
 				@Override
@@ -503,7 +610,6 @@ public class Prism extends JFrame implements ActionListener {
 				panel_pryzmat.setPrismAngle(angle);
 				repaint();
 			}
-			
 			
 			void WaveColor()
 			{
@@ -548,7 +654,6 @@ public class Prism extends JFrame implements ActionListener {
 				}
 			}
 			
-			
 			void Reset()
 			{
 				field1.setText("60");
@@ -558,8 +663,7 @@ public class Prism extends JFrame implements ActionListener {
 				Update();
 			}
 			
-			
-			public static void setAnimText()
+			/*public static void setAnimText()
 			{
 				if(language_option==0)
 				{
@@ -570,7 +674,7 @@ public class Prism extends JFrame implements ActionListener {
 				startAnimation.setText("Start animation");
 				}
 				animation_option=0;
-			}
+			}*/
 			
 	
 	@Override
