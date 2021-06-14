@@ -16,6 +16,8 @@ import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Locale;
+import java.util.ResourceBundle;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -101,6 +103,7 @@ public class Prism extends JFrame implements ActionListener {
 	int lambda=500;
 	static int animation_option=0;
 	static int language_option=0;
+	ResourceBundle rb = ResourceBundle.getBundle("lang/cfg/resource_bundle");
 	
 	public Prism() throws HeadlessException {
 		this.setSize(1500,800);
@@ -131,7 +134,7 @@ public class Prism extends JFrame implements ActionListener {
 		this.add(panel_pryzmat, BorderLayout.CENTER);
 		panel_pryzmat.setBackground(Color.white);
 //Lewy panel		
-		labelsuwak = new JLabel("Prędkość animacji");
+		labelsuwak = new JLabel(rb.getString("animacja"));
 		panel1.add(labelsuwak);
 		
 		slider = new JSlider(JSlider.HORIZONTAL, SLIDER_MIN, SLIDER_MAX, SLIDER_INIT);
@@ -360,6 +363,13 @@ public class Prism extends JFrame implements ActionListener {
 				@Override
 				public void actionPerformed(ActionEvent arg0) 
 				{
+					try {
+						panel_pryzmat.AnimationStop();
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					
 					label7.setText(String.valueOf(panel_pryzmat.getDelta()));
 					startAnimation.setVisible(false);
 					stopAnimation.setVisible(true);
@@ -380,15 +390,7 @@ public class Prism extends JFrame implements ActionListener {
 						
 					}), 0, 1, MILLISECONDS);
 					
-						
-						if(language_option==0)
-						{
-							startAnimation.setText("Zatrzymaj animację");			
-						}
-						else if(language_option==1)
-						{
-							startAnimation.setText("Stop animation");
-						}
+			
 					
 				}
 				
@@ -408,14 +410,7 @@ public class Prism extends JFrame implements ActionListener {
 								e.printStackTrace();
 							}
 							
-							if(language_option==0)
-							{
-								startAnimation.setText("Uruchom animację");			
-							}
-							else if(language_option==1)
-							{
-								startAnimation.setText("Start animation");
-					}
+			
 				}
 			};
 			
@@ -517,66 +512,56 @@ public class Prism extends JFrame implements ActionListener {
 					
 					
 					if(language_option==0)
-					{
-						label6.setText("Angle of refraction [deg]:");
-						label4.setText("Angle of incidence [deg]:");
-						label1.setText("Apical angle [deg]:");
-						label2.setText("Refractive index (prism):");
-						label3.setText("Refractive index (medium):");
-						labelsuwak.setText("Animation speed");
-						wavelengthLabel.setText("Wavelength [nm]:");
-						button1.setText("Exit");
-						button2.setText("Reset");
-						changeLanguage.setText("Zmień język");
-						changeBackgroundColor.setText("Change background color");
-						menu.setText("Options");
-						saveFile.setText("Save");
-						openFile.setText("Load");
-						authors.setText("About...");
-						text_authors="by Maciej Kołakowski, Dominika Węgrzyniak";
-						button3.setText("Update");
-						
-						if(animation_option==0)
-						{
-							startAnimation.setText("Start animation");				
-						}
-						else if(animation_option==1)
-						{
-							startAnimation.setText("Stop animation");
-						}
+					{	
+						Locale.setDefault(new Locale("en", "EN"));
+						rb = ResourceBundle.getBundle("lang/cfg/resource_bundle");
+						label6.setText(rb.getString("kat_zal_pro"));
+						label4.setText(rb.getString("kat_pad_pro"));
+						label1.setText(rb.getString("kat_zal_pryz"));
+						label2.setText(rb.getString("wsp_zal_pryz"));
+						label3.setText(rb.getString("wsp_zal_os"));
+						labelsuwak.setText(rb.getString("animacja"));
+						wavelengthLabel.setText(rb.getString("dl_fal"));
+						button1.setText(rb.getString("wyl"));
+						button2.setText(rb.getString("res"));
+						changeLanguage.setText(rb.getString("jez"));
+						changeBackgroundColor.setText(rb.getString("tlo"));
+						menu.setText(rb.getString("opc"));
+						saveFile.setText(rb.getString("zapis"));
+						openFile.setText(rb.getString("wczytaj"));
+						authors.setText(rb.getString("info"));
+						text_authors=rb.getString("autor");
+						button3.setText(rb.getString("akt"));
+						startAnimation.setText(rb.getString("ur_anim"));				
+						stopAnimation.setText(rb.getString("zatrz_anim"));
 						
 						language_option=1;
 					
 					}
 					else if(language_option==1)
 					{
+						Locale.setDefault(new Locale("pl", "PL"));
+						rb = ResourceBundle.getBundle("lang/cfg/resource_bundle");
+						label6.setText(rb.getString("kat_zal_pro"));
+						label4.setText(rb.getString("kat_pad_pro"));
+						label1.setText(rb.getString("kat_zal_pryz"));
+						label2.setText(rb.getString("wsp_zal_pryz"));
+						label3.setText(rb.getString("wsp_zal_os"));
+						labelsuwak.setText(rb.getString("animacja"));
+						wavelengthLabel.setText(rb.getString("dl_fal"));
+						button1.setText(rb.getString("wyl"));
+						button2.setText(rb.getString("res"));
+						changeLanguage.setText(rb.getString("jez"));
+						changeBackgroundColor.setText(rb.getString("tlo"));
+						menu.setText(rb.getString("opc"));
+						saveFile.setText(rb.getString("zapis"));
+						openFile.setText(rb.getString("wczytaj"));
+						authors.setText(rb.getString("info"));
+						text_authors=rb.getString("autor");
+						button3.setText(rb.getString("akt"));
+						startAnimation.setText(rb.getString("ur_anim"));				
+						stopAnimation.setText(rb.getString("zatrz_anim"));
 						
-						label6.setText("Kąt załamania promienia [deg]:");
-						label4.setText("Kąt padania promienia [deg]:");
-						label1.setText("Kąt załamania pryzmatu [deg]:");
-						label2.setText("Współczynnik załamania pryzmatu:");
-						label3.setText("Współczynnik załamania ośrodka:");
-						labelsuwak.setText("Prędkość animacji");
-						wavelengthLabel.setText("Długość fali [nm]:");
-						button1.setText("Wyłącz");
-						button2.setText("Resetuj");
-						changeLanguage.setText("Change language");
-						changeBackgroundColor.setText("Zmień kolor tła");
-						menu.setText("Opcje");
-						saveFile.setText("Zapisz do pliku");
-						openFile.setText("Wczytaj z pliku");
-						authors.setText("Informacje o programie");
-						text_authors="autorzy: Maciej Kołakowski, Dominika Węgrzyniak";
-						button3.setText("Aktualizuj");
-						
-						if(animation_option==0)
-						{
-							startAnimation.setText("Uruchom animację");				
-						}
-						else if(animation_option==1)
-						{
-							startAnimation.setText("Zatrzymaj animację");
-						}
 						
 						language_option=0;
 						

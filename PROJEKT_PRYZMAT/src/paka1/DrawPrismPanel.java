@@ -238,6 +238,7 @@ public class DrawPrismPanel extends JPanel{
 					}
 					
 				}), 0, speed, MILLISECONDS);
+				isAnimation = true;
 		}	
 		
 		public void AnimationStop() throws InterruptedException
