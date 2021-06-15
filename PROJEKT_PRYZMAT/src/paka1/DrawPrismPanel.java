@@ -69,6 +69,7 @@ public class DrawPrismPanel extends JPanel{
 			triX[2] = 600+x;
   	        
   	        beta1 = Math.asin(nO*Math.sin(incidenceAngle)/nP);
+  	        
 			if(nO>nP) {
 				alpha_gr1 = Math.asin(nP/nO);
 			}
@@ -76,7 +77,7 @@ public class DrawPrismPanel extends JPanel{
 				alpha_gr1 = 180;
 			}
   	        
-			if(prismAngle - incidenceAngle/nP <= Math.PI/3) {
+			if(prismAngle - incidenceAngle <= Math.PI/3) {
 				beta2 = prismAngle - beta1;
 				alpha2 = Math.asin(nP*Math.sin(beta2)/nO);
 				delta = incidenceAngle + alpha2 - prismAngle;
@@ -94,7 +95,7 @@ public class DrawPrismPanel extends JPanel{
 	          	iX3[0] = iX2[1];
 	          	iY3[0] = iY2[1];
 	          	iX3[1] = (int) (iX3[0] + 200); 
-	          	iY3[1] = (int) (iY3[0] - 200* Math.tan(prismAngle/2 - alpha2)); 
+	          	iY3[1] = (int) (iY3[0] + 200* Math.tan(prismAngle/2 - alpha2)); 
 	          	
 	          	ray2 = new Ray(iX2[0], iX2[1], iY2[0], iY2[1], -prismAngle/2+beta1, color);
 	          	ray3 = new Ray(iX3[0], iX3[1], iY3[0], iY3[1], prismAngle/2-alpha2, color);
@@ -110,17 +111,17 @@ public class DrawPrismPanel extends JPanel{
 	          	iX2[1] = (int) (iX1[1] + 125/Math.tan(prismAngle/2 - beta1));
 	          	iY2[1] = 400;
 	          	
-	          	beta2 = Math.PI/2 - prismAngle +beta1;
+	          	beta2 = Math.PI/2 - prismAngle/2 + beta1;
 	          	alpha2 = Math.asin(nP*Math.sin(beta2)/nO);
-				delta = incidenceAngle + alpha2 - prismAngle;
+				delta = incidenceAngle - beta1 - beta2 + alpha2;
 	          	
 	          	iX3[0] = iX2[1];
 	          	iY3[0] = iY2[1];
 	          	iX3[1] = (int) (iX3[0] + 200); 
-	          	iY3[1] = (int) (iY3[0] + 200* Math.tan(alpha2)); 
+	          	iY3[1] = (int) (iY3[0] - 200/Math.tan(alpha2));
 	          	
 	          	ray2 = new Ray(iX2[0], iX2[1], iY2[0], iY2[1], -prismAngle/2+beta1, color);
-	          	ray3 = new Ray(iX3[0], iX3[1], iY3[0], iY3[1], -prismAngle/2+alpha2, color);
+	          	ray3 = new Ray(iX3[0], iX3[1], iY3[0], iY3[1], -Math.PI/2+alpha2, color);
 			}
         }
         
@@ -176,10 +177,11 @@ public class DrawPrismPanel extends JPanel{
 				
 		void Animation() {
 				if(incidenceAngle>=alpha_gr1) {
+					delta = 0;
 					JOptionPane.showMessageDialog(getRootPane(), "Całkowite wewnętrzne odbicie");
 					return;
 				}
-				if(prismAngle - incidenceAngle <= Math.PI/3) {
+				if(prismAngle - incidenceAngle/nP <= Math.PI/3) {
 					beta2 = prismAngle - beta1;
 					alpha2 = Math.asin(nP*Math.sin(beta2)/nO);
 					delta = incidenceAngle + alpha2 - prismAngle;
@@ -193,7 +195,7 @@ public class DrawPrismPanel extends JPanel{
 				}
 			
 				else {
-					beta2 = Math.PI/2 - prismAngle-beta1;
+					beta2 = Math.PI/2 - prismAngle/2 - beta1;
 		          	alpha2 = Math.asin(nP*Math.sin(beta2)/nO);
 					delta = incidenceAngle + alpha2 - prismAngle;
 

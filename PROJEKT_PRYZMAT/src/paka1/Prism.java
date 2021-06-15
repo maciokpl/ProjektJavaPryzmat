@@ -103,7 +103,7 @@ public class Prism extends JFrame implements ActionListener {
 	int lambda=500;
 	static int animation_option=0;
 	static int language_option=0;
-	ResourceBundle rb = ResourceBundle.getBundle("lang/cfg/resource_bundle");
+	ResourceBundle rb = ResourceBundle.getBundle("lang/cfg/resource_bundle_en_EN");
 	
 	public Prism() throws HeadlessException {
 		this.setSize(1500,800);
@@ -583,6 +583,11 @@ public class Prism extends JFrame implements ActionListener {
 			
 			void Update()
 			{
+				panel_pryzmat.init();
+				
+				startAnimation.setVisible(true);
+				stopAnimation.setVisible(false);
+				
 				WaveColor();
 				
 				double n1 = Double.parseDouble(field3.getText());
