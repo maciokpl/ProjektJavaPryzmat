@@ -103,7 +103,7 @@ public class Prism extends JFrame implements ActionListener {
 	int lambda=500;
 	static int animation_option=0;
 	static int language_option=0;
-	ResourceBundle rb = ResourceBundle.getBundle("lang/cfg/resource_bundle_en_EN");
+	ResourceBundle rb = ResourceBundle.getBundle("lang/cfg/resource_bundle_pl_PL");
 	
 	public Prism() throws HeadlessException {
 		this.setSize(1500,800);

@@ -55,6 +55,7 @@ public class DrawPrismPanel extends JPanel{
         public void init() {
         	isRay2 = true;
         	isAnimation = false;
+        	delta=0;
         	
         	iX1 = new int[2];
   	        iY1 = new int[2];
@@ -77,7 +78,7 @@ public class DrawPrismPanel extends JPanel{
 				alpha_gr1 = 180;
 			}
   	        
-			if(prismAngle - incidenceAngle <= Math.PI/3) {
+			if(prismAngle - incidenceAngle*nO/nP <= Math.PI/3) {
 				beta2 = prismAngle - beta1;
 				alpha2 = Math.asin(nP*Math.sin(beta2)/nO);
 				delta = incidenceAngle + alpha2 - prismAngle;
@@ -181,7 +182,7 @@ public class DrawPrismPanel extends JPanel{
 					JOptionPane.showMessageDialog(getRootPane(), "Całkowite wewnętrzne odbicie");
 					return;
 				}
-				if(prismAngle - incidenceAngle/nP <= Math.PI/3) {
+				if(prismAngle - incidenceAngle*nO/nP <= Math.PI/3) {
 					beta2 = prismAngle - beta1;
 					alpha2 = Math.asin(nP*Math.sin(beta2)/nO);
 					delta = incidenceAngle + alpha2 - prismAngle;
