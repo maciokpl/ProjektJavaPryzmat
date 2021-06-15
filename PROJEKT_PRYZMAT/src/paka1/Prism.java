@@ -99,11 +99,12 @@ public class Prism extends JFrame implements ActionListener {
 
 	static String animtext;
 	String text_authors="autorzy: Maciej Kołakowski, Dominika Węgrzyniak";
+	static String odb="Całkowite wewnętrzne odbicie"; 
 	long sliderspeed;
 	int lambda=500;
 	static int animation_option=0;
 	static int language_option=0;
-	ResourceBundle rb = ResourceBundle.getBundle("lang/cfg/resource_bundle_en_EN");
+	ResourceBundle rb = ResourceBundle.getBundle("lang/cfg/resource_bundle_pl_PL");
 	
 	public Prism() throws HeadlessException {
 		this.setSize(1500,800);
@@ -534,6 +535,7 @@ public class Prism extends JFrame implements ActionListener {
 						button3.setText(rb.getString("akt"));
 						startAnimation.setText(rb.getString("ur_anim"));				
 						stopAnimation.setText(rb.getString("zatrz_anim"));
+						odb = rb.getString("odbicie");
 						
 						language_option=1;
 					
@@ -561,7 +563,7 @@ public class Prism extends JFrame implements ActionListener {
 						button3.setText(rb.getString("akt"));
 						startAnimation.setText(rb.getString("ur_anim"));				
 						stopAnimation.setText(rb.getString("zatrz_anim"));
-						
+						odb = rb.getString("odbicie");
 						
 						language_option=0;
 						
@@ -665,12 +667,16 @@ public class Prism extends JFrame implements ActionListener {
 				}
 				animation_option=0;
 			}*/
-			
+			public static String Refl()
+			{
+				String str=odb;
+				return str;
+			}
 	
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		// TODO Auto-generated method stub
-
+		
 	}
 
 	public static void main(String[] args) {
